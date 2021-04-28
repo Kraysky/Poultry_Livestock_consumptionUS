@@ -9,6 +9,7 @@
 ## Details
 	Main file: Poultry and livestock consumption in US.xlsmx
 	Dataset: dataset.xlsx
-	DAX Code: 
-	MDX Code:
-	VBA Code:
+	DAX Code: DAX.txt
+	MDX Code: MDX.txt
+	VBA Code: VBA.txt
+	M code: M code.txt

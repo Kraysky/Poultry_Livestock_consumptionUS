@@ -1,0 +1,80 @@
+//measure to create hierarchy for MDX dataset
+
+Category Hierarchy=
+IF (
+    HASONEFILTER ( Sheet1[Category] ),
+    IF ( HASONEFILTER ( Sheet1[Meat] ), 2, 1 ),
+    0
+)
+
+
+//Calculating aggregated sales value according to hierarchy
+
+Consumption ALL in Year=
+IF (
+    HASONEFILTER ( Sheet1[Category] ),
+    IF (
+        HASONEFILTER ( Sheet1[Meat] ),
+        CALCULATE ( SUM ( [Value] ), ALL ( Sheet1[Meat] ) ),
+        CALCULATE ( SUM ( Sheet1[Value] ), ALL ( Sheet1[Category] ) )
+    ),
+    0
+)
+
+
+//Calculating % share of consumption
+
+%share of consumption=
+DIVIDE ( SUM ( Sheet1[Value] ), [Consumption ALL in Year], 0 )
+
+
+//Calculating average consumption acrros aggregated categories
+
+AVG=
+AVERAGEX (
+    SUMMARIZE (
+        Sheet1,
+        Sheet1[Years],Sheet1[Category],
+        "SUMA", SUM(Sheet1[Value])
+    ),
+    [SUMA]
+)
+
+
+//Calculating standard deviation in consumption acrros aggregated categories
+
+STDEV=
+STDEVX.P (
+    SUMMARIZE (
+        Sheet1,
+        Sheet1[Years],Sheet1[Category],
+        "SUMA", SUM(Sheet1[Value])
+    ),
+    [SUMA]
+)
+
+
+//Calculating max value of consumption acrros aggregated categories
+
+MAX=
+MAXX (
+    SUMMARIZE (
+        Sheet1,
+        Sheet1[Years],Sheet1[Category],
+        "SUMA", SUM(Sheet1[Value])
+    ),
+    [SUMA]
+)
+
+
+//Calculating min value of consumption acrros aggregated categories
+
+MIN=
+MINX (
+    SUMMARIZE (
+        Sheet1,
+        Sheet1[Years],Sheet1[Category],
+        "SUMA", SUM(Sheet1[Value])
+    ),
+    [SUMA]
+)

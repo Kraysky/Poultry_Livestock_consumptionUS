@@ -1,0 +1,16 @@
+let
+    Source = Excel.Workbook(File.Contents("C:\Users\pkrajewski\Desktop\dataset.xlsx"), null, true),
+    Sheet1_Sheet = Source{[Item="Sheet1",Kind="Sheet"]}[Data],
+    #"Promoted Headers" = Table.PromoteHeaders(Sheet1_Sheet, [PromoteAllScalars=true]),
+    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Year", Int64.Type}, {"Actual/Forecast", type text}, {"Beef", type number}, {"Pork", type number}, {"Total Red Meat", type number}, {"Broilers", type number}, {"Other Chicken", type number}, {"Total Chicken", type number}, {"Turkey", type number}, {"Total Poultry", type number}, {"Total Red Meat & Poultry", type number}, {"Commercial Fish & Shell-Fish", type number}}),
+    #"Unpivoted Columns" = Table.UnpivotOtherColumns(#"Changed Type", {"Year", "Actual/Forecast"}, "Attribute", "Value"),
+    #"Filtered Rows" = Table.SelectRows(#"Unpivoted Columns", each ([#"Actual/Forecast"] = "Actual")),
+    #"Added Conditional Column" = Table.AddColumn(#"Filtered Rows", "Category", each if [Attribute] = "Beef" then "Red Meat" else if [Attribute] = "Pork" then "Red Meat" else if [Attribute] = "Broilers" then "Poultry" else if [Attribute] = "Other Chicken" then "Poultry" else if [Attribute] = "Turkey" then "Poultry" else "Fishes"),
+    #"Filtered Rows1" = Table.SelectRows(#"Added Conditional Column", each ([Attribute] <> "Total Chicken" and [Attribute] <> "Total Poultry" and [Attribute] <> "Total Red Meat" and [Attribute] <> "Total Red Meat & Poultry")),
+    #"Reordered Columns" = Table.ReorderColumns(#"Filtered Rows1",{"Year", "Actual/Forecast", "Category", "Attribute", "Value"}),
+    #"Renamed Columns" = Table.RenameColumns(#"Reordered Columns",{{"Attribute", "Meat"}}),
+    #"Added Custom" = Table.AddColumn(#"Renamed Columns", "Years", each Date.Year(#datetime([Year], 1, 1, 0, 00, 00))),
+    #"Reordered Columns1" = Table.ReorderColumns(#"Added Custom",{"Years", "Year", "Actual/Forecast", "Category", "Meat", "Value"}),
+    #"Removed Columns" = Table.RemoveColumns(#"Reordered Columns1",{"Year"})
+in
+    #"Removed Columns"

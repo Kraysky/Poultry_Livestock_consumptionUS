@@ -1,0 +1,10 @@
+'Simple Macro to adjust dashboard to screen resolution
+
+Private Sub Workbook_Open()
+
+ ThisWorkbook.Worksheets("Dashboard").Select
+ Range("A1:Z41").Select
+ ActiveWindow.Zoom = True
+ Range("A1").Select
+ 
+End Sub
